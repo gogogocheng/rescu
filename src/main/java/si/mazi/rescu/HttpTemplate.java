@@ -61,12 +61,24 @@ class HttpTemplate {
     private final OAuthConsumer oAuthConsumer;
 
 
+    //add by qiancheng add proxyType
+    HttpTemplate(int readTimeout, String proxyType, String proxyHost, Integer proxyPort,
+                 SSLSocketFactory sslSocketFactory, HostnameVerifier hostnameVerifier, OAuthConsumer oAuthConsumer) {
+        this(0, readTimeout, proxyHost, proxyPort, sslSocketFactory, hostnameVerifier, oAuthConsumer);
+    }
+
     HttpTemplate(int readTimeout, String proxyHost, Integer proxyPort,
                  SSLSocketFactory sslSocketFactory, HostnameVerifier hostnameVerifier, OAuthConsumer oAuthConsumer) {
-      this(0, readTimeout, proxyHost, proxyPort, sslSocketFactory, hostnameVerifier, oAuthConsumer);
+        this(0, readTimeout, proxyHost, proxyPort, sslSocketFactory, hostnameVerifier, oAuthConsumer);
     }
-    
+
     HttpTemplate(int connTimeout, int readTimeout, String proxyHost, Integer proxyPort,
+                 SSLSocketFactory sslSocketFactory, HostnameVerifier hostnameVerifier, OAuthConsumer oAuthConsumer) {
+        this(connTimeout,readTimeout,"HTTP",proxyHost,proxyPort,sslSocketFactory,hostnameVerifier,oAuthConsumer);
+    }
+
+    //add by qiancheng add proxyType
+    HttpTemplate(int connTimeout, int readTimeout, String proxyType, String proxyHost, Integer proxyPort,
                  SSLSocketFactory sslSocketFactory, HostnameVerifier hostnameVerifier, OAuthConsumer oAuthConsumer) {
         this.connTimeout = connTimeout;
         this.readTimeout = readTimeout;
@@ -83,7 +95,14 @@ class HttpTemplate {
         if (proxyHost == null || proxyPort == null) {
             proxy = Proxy.NO_PROXY;
         } else {
-            proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyHost, proxyPort));
+            String tmpType = proxyType.toUpperCase();
+            if("SOCKS5".equals(tmpType) || "SOCKS4".equals(tmpType)) tmpType = "SOCKS";
+            Proxy.Type type = Proxy.Type.valueOf(tmpType);
+            if (type == null) {
+                log.warn("proxyType:{} is not correct, use default HTTP proxy",proxyHost);
+                type = Proxy.Type.HTTP;
+            }
+            proxy = new Proxy(type, new InetSocketAddress(proxyHost, proxyPort));
             log.info("Using proxy {}", proxy);
         }
     }

@@ -44,6 +44,7 @@ public class ClientConfig {
     private int httpConnTimeout;
     private int httpReadTimeout;
     private Integer proxyPort;
+    private String proxyType;
     private String proxyHost;
     private boolean ignoreHttpErrorCodes;
     private boolean wrapUnexpectedExceptions;
@@ -54,6 +55,7 @@ public class ClientConfig {
         httpReadTimeout = Config.getHttpReadTimeout();
         proxyPort = Config.getProxyPort();
         proxyHost = Config.getProxyHost();
+        proxyType = null;
         ignoreHttpErrorCodes = Config.isIgnoreHttpErrorCodes();
         wrapUnexpectedExceptions = Config.isWrapUnexpectedExceptions();
     }
@@ -70,6 +72,14 @@ public class ClientConfig {
 
     public Map<Class<? extends Annotation>, Params> getDefaultParamsMap() {
         return defaultParamsMap;
+    }
+
+    public String getProxyType() {
+        return proxyType;
+    }
+
+    public void setProxyType(String proxyType) {
+        this.proxyType = proxyType;
     }
 
     /**
